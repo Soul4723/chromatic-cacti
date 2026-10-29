@@ -3,6 +3,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, sep, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { networkInterfaces } from 'node:os';
+import { spawn } from 'node:child_process';
 
 const root = resolve(process.env.ROOT || fileURLToPath(new URL('.', import.meta.url)));
 const mime = new Map([
@@ -35,11 +36,24 @@ const server = createServer(async (request, response) => {
 
 const port = Number(process.env.PORT || 5173);
 const host = process.env.HOST || '127.0.0.1';
+function openBrowser(url) {
+  const [command, args] = process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+    : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
+  try { spawn(command, args, { stdio: 'ignore', detached: true }).on('error', () => {}).unref(); } catch {}
+}
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') console.error(`Port ${port} is already in use. The game may already be running: open http://127.0.0.1:${port}`);
+  else console.error(error.message);
+  process.exit(1);
+});
 server.listen(port, host, () => {
+  const url = `http://127.0.0.1:${port}`;
   console.log('Chromatic Cacti is running:');
   if (host === '0.0.0.0' || host === '::') {
-    console.log(`  Local:   http://127.0.0.1:${port}`);
+    console.log(`  Local:   ${url}`);
     for (const list of Object.values(networkInterfaces()))
       for (const a of list || []) if (a.family === 'IPv4' && !a.internal) console.log(`  Network: http://${a.address}:${port}`);
   } else console.log(`  http://${host}:${port}`);
+  console.log('Keep this window open while you play. Close it (or press Ctrl+C) to stop the game.');
+  if (process.argv.includes('--open')) openBrowser(url);
 });

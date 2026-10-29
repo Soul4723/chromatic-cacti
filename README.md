@@ -4,14 +4,26 @@ A little 3D cactus garden game that runs in your web browser. Grow weird, colour
 
 ![The garden during a pest raid](screenshot.png)
 
-## Playing it
+## Download and play
 
-You don't need to install anything.
+**1. Install Node.js** (one time only). Go to [nodejs.org](https://nodejs.org), download the **LTS** version, and install it like any other program.
 
-- **Got a link?** Just open it.
-- **Got a file called `index.html` or `chromatic-cacti.html`?** Double-click it. It opens in your web browser and the game starts.
+**2. Download the game.** Near the top of this page, click the green **Code** button, then **Download ZIP**. Unzip it. On Windows: right-click the ZIP, then **Extract All**. You'll get a folder called `chromatic-cacti-main`.
 
-It works in Chrome, Edge, Firefox and Safari, on a computer or a phone.
+**3. Open a terminal in that folder.**
+- **Windows:** open the `chromatic-cacti-main` folder, click the address bar at the top of the window, type `cmd` and press Enter.
+- **Mac:** open the **Terminal** app, type `cd ` (with a space after it), drag the `chromatic-cacti-main` folder into the Terminal window, and press Enter.
+- **Linux:** right-click inside the folder and choose **Open in Terminal**.
+
+**4. Type this and press Enter:**
+
+```
+npm start
+```
+
+The first time, it takes a minute to get ready. Then the game opens in your web browser. If it doesn't, open [http://127.0.0.1:5173](http://127.0.0.1:5173) yourself.
+
+Keep the terminal window open while you play. When you're done, just close it. To play again later, repeat steps 3 and 4.
 
 ## How the game works
 
