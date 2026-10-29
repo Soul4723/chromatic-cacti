@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1c1425">
+  <meta name="description" content="Grow and defend a 3D cactus garden.">
+  <title>Chromatic Cacti</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Chromatic Cacti home"><span class="brand-mark" aria-hidden="true">✳</span><span>CHROMATIC<br><b>CACTI</b></span></a>
+    <div class="season"><strong id="day-count">Day 1</strong></div>
+    <div class="resources" aria-label="Farm resources">
+      <span class="resource" title="Credits: buy seeds, feed and upgrades. Earn them by selling cacti."><i class="coin" aria-hidden="true">✦</i><span id="credits">0</span><small>credits</small></span>
+      <span class="resource" title="Water: 1 per watering. Refills a little every day."><i class="drop" aria-hidden="true">●</i><span id="water">0</span><small>water</small></span>
+      <span class="resource" title="Essence: recolor grown cacti so they sell for more."><i class="essence" aria-hidden="true">✧</i><span id="essence">0</span><small>essence</small></span>
+    </div>
+    <div class="top-actions"><button id="guide-toggle" class="icon-button" type="button" aria-pressed="true" title="Tips">? <span class="sr-only">Hide tips</span></button><button id="sound-toggle" class="icon-button" type="button" aria-pressed="false" title="Toggle sound">♫ <span class="sr-only">Turn sound on</span></button><button id="motion-toggle" class="icon-button" type="button" aria-pressed="false" title="Reduce motion">◌ <span class="sr-only">Reduce motion</span></button><button id="save-button" class="text-button" type="button">Save</button><button id="reset-button" class="text-button reset" type="button">Reset</button></div>
+  </header>
+
+  <main id="home">
+    <div class="game-layout">
+      <aside class="side-rail" aria-label="Garden tools and seed nursery">
+        <section class="tool-section"><div class="tool-list" role="group" aria-label="Choose a garden tool">
+          <button class="tool active" data-tool="inspect" type="button" aria-pressed="true"><span class="tool-icon">⌕</span><span>Inspect</span></button>
+          <button class="tool" data-tool="plant" type="button" aria-pressed="false"><span class="tool-icon">＋</span><span>Plant seed</span></button>
+          <button class="tool" data-tool="water" type="button" aria-pressed="false"><span class="tool-icon">♧</span><span>Water</span><small>1 water</small></button>
+          <button class="tool" data-tool="feed" type="button" aria-pressed="false"><span class="tool-icon">✧</span><span>Feed</span><small id="feed-price">—</small></button>
+        </div></section>
+        <section class="nursery"><p class="rail-heading">Seeds</p><p class="section-hint">Pick a seed, then tap an empty <b>+</b> plot.</p><div id="seed-list" class="seed-list" aria-label="Available cactus seeds"></div></section>
+        <section class="farm-expansion"><p>Need more room? +4 plots for <b id="expand-price">—</b> credits</p><button id="expand-button" class="outline-button" type="button">Expand garden</button></section>
+      </aside>
+
+      <section class="scene-wrap" aria-label="Your cactus garden">
+        <div class="scene-heading"><h1>Garden</h1><div class="scene-actions"><a class="seed-jump" href="#seed-list">Seeds ↓</a><button id="next-day" class="day-button" type="button" title="Your cacti grow, soil dries a little and water refills.">Next day →</button></div></div>
+        <div id="guide" class="guide" role="status" aria-live="polite" hidden><span class="guide-icon" aria-hidden="true">✳</span><div class="guide-body"><p id="guide-welcome" class="guide-welcome" hidden>Welcome to your cactus garden! Grow cacti, sell them for credits, and squash the pests that come for them.</p><p class="guide-step"><b id="guide-title"></b> <span id="guide-text"></span></p></div><button id="guide-action" class="day-button guide-action" type="button" hidden></button><button id="guide-dismiss" class="guide-dismiss" type="button" aria-label="Hide this tip" title="Hide this tip">×</button></div>
+        <details class="environment"><summary><span id="weather-summary">—</span></summary><div class="environment-details"><span id="season-name">—</span><span>Today: <b id="weather-name">—</b></span><span>Next: <b id="forecast-name">—</b></span><p id="environment-description"></p></div></details>
+        <div id="scene-frame" class="scene-frame"><canvas id="landscape" aria-label="3D cactus garden. Drag to orbit; scroll to zoom."></canvas><div id="webgl-error" class="webgl-error" role="alert" hidden></div><div id="pest-layer" class="actor-layer pest-layer" aria-label="Garden pests"></div><div id="worm-layer" class="actor-layer worm-layer" aria-label="Friendly worms to collect"></div><div id="effect-layer" class="effect-layer" aria-hidden="true"></div><div id="plot-layer" class="plot-layer" aria-label="Garden plots"></div><p id="raid-callout" class="raid-callout" aria-hidden="true" hidden></p></div>
+        <div class="view-controls" role="group" aria-label="3D camera controls"><button id="view-left" type="button" aria-label="Rotate camera left">↶</button><button id="view-right" type="button" aria-label="Rotate camera right">↷</button><button id="view-in" type="button" aria-label="Zoom camera in">＋</button><button id="view-out" type="button" aria-label="Zoom camera out">−</button><button id="view-reset" type="button">Reset view</button></div>
+        <div class="defense-hud" aria-label="Garden defense">
+          <div class="defense-top"><div><h3 id="raid-title">Level 1 · Ready</h3></div><div class="raid-integrity"><span title="Pests that reach your plants wear this down. If it hits 0 the wave is lost. Cactus health is separate.">Garden defenses <b id="integrity-value">100%</b></span><div class="meter"><span id="integrity-meter"></span></div></div><div class="raid-enemies"><b id="enemy-count">0</b><span>pests left</span></div></div>
+          <p id="raid-description" class="raid-description">Ready</p>
+          <div class="nursery-repair"><p id="integrity-hint">If this runs out, the wave is lost.</p><button id="repair-nursery" class="outline-button" type="button">Repair defenses</button></div>
+          <div id="boss-warning" class="boss-warning" hidden><b id="boss-name">Boss incoming</b><span id="boss-tip"></span><div class="boss-health"><span id="boss-health-meter"></span></div></div>
+          <div class="defense-controls"><div class="weapon-select" role="group" aria-label="Choose a defense tool"><button id="stomp-mode" class="weapon-button active" type="button" aria-pressed="true">🦶 Stomp <span id="stomp-stat">—</span><kbd>1</kbd></button><button id="spray-mode" class="weapon-button" type="button" aria-pressed="false">✦ Spray <span id="spray-stat">—</span><kbd>2</kbd></button></div><div class="defense-actions"><button id="start-wave" class="day-button" type="button">Start wave</button><button id="pause-raid" class="outline-button" type="button" hidden>Pause raid</button><button id="retreat-wave" class="outline-button retreat-button" type="button" title="Abandon this wave. Plant damage remains, but you can retry for free." hidden>Retreat</button><button id="reload-spray" class="outline-button" type="button" hidden>Reload <kbd>R</kbd></button></div><div class="ammo-readout"><span>Spray</span><b id="spray-ammo">—</b><small id="cooldown-readout">Stomp ready</small></div></div>
+          <div class="defense-bottom"><span>Worms <b id="worm-inventory">0</b> · Fertilizer <b id="fertilizer-stock">0</b></span><span id="raid-controls-hint" hidden>Tap pests to hit them · keys: 1 stomp · 2 spray · R reload</span></div>
+          <p id="combat-message" class="combat-message" role="status" aria-live="polite"></p>
+        </div>
+        <div class="scene-footer"><span id="plot-count">12 plots</span></div>
+      </section>
+
+      <aside class="detail-panel" aria-labelledby="detail-title"><div class="detail-top"><span id="plant-status" class="status-pill"></span></div><canvas id="plant-portrait" width="180" height="150" aria-hidden="true"></canvas><div id="empty-detail" class="empty-detail"><h2 id="detail-title">Tap a cactus</h2><p>Tap a plant in the garden to check on it, water it or sell it.</p><div class="how-to"><p class="eyebrow">HOW TO PLAY</p><ol><li>Plant seeds in empty plots.</li><li>Water cacti when they get thirsty.</li><li>Press <b>Next day</b> to let them grow.</li><li>Sell grown cacti or fill orders for credits.</li><li>Squash pests in raids for big rewards.</li></ol></div></div><div id="plant-detail" hidden><h2 id="plant-name">Plant name</h2><p id="plant-latin" class="latin"></p><p id="plant-description" class="plant-description"></p><div class="growth-row"><span>Growth</span><b id="growth-value">0%</b></div><div class="meter"><span id="growth-meter"></span></div><div class="stats"><div><span>Health</span><b id="health-value">—</b></div><div><span>Moisture</span><b id="moisture-value">—</b></div><div><span>Age</span><b id="age-value">—</b></div></div><p id="mutation-line" class="mutation-line"></p><div id="mutation-controls" class="mutation-controls"><p id="mutation-heading" class="eyebrow">COLOR &amp; FORM</p><div id="mutation-list" class="mutation-list"></div></div><div id="worm-care" class="propagation-box worm-care"><p id="worm-stock-help">Worms and fertilizer give a cactus a quick boost.</p><div class="care-actions worm-care-actions"><button id="feed-worm" type="button">Feed worm</button><button id="feed-fertilizer" type="button">Use fertilizer</button></div></div><div id="propagation-box" class="propagation-box"><p id="propagation-hint">Choose a destination to clone this cactus.</p><button id="propagate-button" class="outline-button" type="button">Choose destination</button></div><div class="care-actions"><button id="care-water" type="button">Water · 1</button><button id="care-feed" type="button">Feed</button><button id="sell-button" class="sell-button" type="button" hidden>Sell specimen</button></div><p id="plant-message" class="action-message" role="status" aria-live="polite"></p></div></aside>
+    </div>
+
+  <section class="management" aria-labelledby="management-title"><h2 id="management-title" class="section-title">Farm</h2><div class="management-tabs" role="tablist" aria-label="Farm management"><button id="tab-orders" role="tab" aria-selected="true" aria-controls="panel-orders" type="button">Orders <span id="order-count">3</span></button><button id="tab-upgrades" role="tab" aria-selected="false" aria-controls="panel-upgrades" type="button" tabindex="-1">Greenhouse</button><button id="tab-milestones" role="tab" aria-selected="false" aria-controls="panel-milestones" type="button" tabindex="-1">Milestones <span id="milestone-count"></span></button><button id="tab-defense" role="tab" aria-selected="false" aria-controls="panel-defense" type="button" tabindex="-1">Defense</button><button id="tab-worms" role="tab" aria-selected="false" aria-controls="panel-worms" type="button" tabindex="-1">Worm farm</button></div><div id="panel-orders" class="management-panel" role="tabpanel" aria-labelledby="tab-orders"><div id="orders-list" class="order-grid"></div></div><div id="panel-upgrades" class="management-panel" role="tabpanel" aria-labelledby="tab-upgrades" hidden><div id="upgrades-list" class="upgrade-grid"></div></div><div id="panel-milestones" class="management-panel" role="tabpanel" aria-labelledby="tab-milestones" hidden><div id="milestones-list" class="milestone-list"></div></div><div id="panel-defense" class="management-panel" role="tabpanel" aria-labelledby="tab-defense" hidden><div id="defense-upgrades" class="upgrade-grid"></div></div><div id="panel-worms" class="management-panel" role="tabpanel" aria-labelledby="tab-worms" hidden><div id="worm-farm-card" class="worm-farm-card"></div></div></section>
+  <section class="collection" aria-labelledby="collection-title"><details id="collection-details" class="collection-details"><summary class="collection-heading"><h2 id="collection-title">Collection</h2><p id="collection-progress">0 / 24</p></summary><p class="section-hint">Every species and color you have grown. Recolor cacti to find the rest.</p><div id="collection-list" class="collection-list"></div><p id="collection-complete" class="collection-complete" hidden>Collection complete.</p></details></section>
+  </main>
+  <div id="mobile-combat-dock" class="mobile-combat-dock" aria-label="Quick raid controls" hidden>
+    <button id="dock-stomp" type="button" aria-label="Select stomp">Stomp</button>
+    <button id="dock-spray" type="button" aria-label="Select spray">Spray</button>
+    <button id="dock-reload" type="button">Reload</button>
+    <button id="dock-pause" type="button">Pause</button>
+    <button id="dock-retreat" type="button">Retreat</button>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="reset-dialog"><form method="dialog"><h2>Reset garden?</h2><p>This deletes your garden and saved progress.</p><div class="dialog-actions"><button value="cancel" class="outline-button">Cancel</button><button id="confirm-reset" value="reset" class="danger-button">Reset garden</button></div></form></dialog>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>

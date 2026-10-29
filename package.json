@@ -1,0 +1,24 @@
+{
+  "name": "chromatic-cacti",
+  "version": "1.0.0",
+  "description": "A cozy 3D cactus garden for the browser: grow, mutate and collect cacti, then defend them from pests.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Soul4723/chromatic-cacti.git"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "build": "node scripts/build.mjs",
+    "share": "npm run build && ROOT=dist HOST=0.0.0.0 node server.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  }
+}
