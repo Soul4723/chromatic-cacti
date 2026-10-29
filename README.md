@@ -1,43 +1,62 @@
 # Chromatic Cacti
 
-A cozy 3D cactus garden in your browser. Grow strange, colorful cacti, mutate and collect them, then defend the garden from pests like snails, earwigs and magpies.
+A little 3D cactus garden game that runs in your web browser. Grow weird, colourful cacti, sell them, collect every kind, and squash the snails, bugs and birds that come to eat them.
 
-## How to play
+![The garden during a pest raid](screenshot.png)
 
-- Pick a seed in the nursery, then tap an empty plot to plant it. Tap a plant to water, feed, mutate, sell or inspect it.
-- Fill orders, buy upgrades and expand the garden. The Collection panel tracks every form you've grown.
-- Start a wave in the defense panel to raid-test the garden. **Stomp** hits broadly; **Spray** is smaller but reaches flying magpies.
-- Controls: drag to orbit the camera, scroll to zoom, **1** / **2** pick a weapon, **R** reloads. On phones, everything works by touch.
-- It autosaves in your browser. Sound is off until you turn it on. A WebGL-capable browser is needed.
+## Playing it
 
-## Hosting it
+You don't need to install anything.
 
-Build the single-file game first (needs Node 20+):
+- **Got a link?** Just open it.
+- **Got a file called `index.html` or `chromatic-cacti.html`?** Double-click it. It opens in your web browser and the game starts.
+
+It works in Chrome, Edge, Firefox and Safari, on a computer or a phone.
+
+## How the game works
+
+A tip at the top of the screen always tells you what to do next, so you can just follow that. The basics:
+
+1. **Plant.** Pick a seed on the left, then tap an empty spot in the garden.
+2. **Water.** When a cactus gets thirsty, pick **Water** and tap it.
+3. **Next day.** Press **Next day** to let everything grow.
+4. **Sell.** When a cactus is fully grown, tap it and press **Sell**. Spend the money on more seeds, a bigger garden and upgrades.
+5. **Fight off pests.** Press **Start raid**, then tap the pests to squash them before they eat your cacti. Winning a raid pays well.
+
+As you play you'll unlock more: orders from people who want a particular cactus (they pay extra), new colours and shapes for your cacti, friendly pink worms you can tap to collect and feed to your plants, and a collection of every cactus you've grown.
+
+## Controls
+
+| What | On a computer | On a phone |
+|---|---|---|
+| Look around | Click and drag the garden | Drag the garden |
+| Zoom | Mouse wheel, or the **+** and **−** buttons | The **+** and **−** buttons |
+| Stomp (squashes pests on the ground) | Press **1** | **Stomp** button at the bottom |
+| Spray (also hits birds) | Press **2** | **Spray** button |
+| Refill the spray | Press **R** | **Reload** button |
+
+## Good to know
+
+- **It saves by itself.** Your garden is kept in the browser you played in, on that device. Open it in a different browser or on another device and you start fresh. Clearing your browser's history and site data can wipe it too.
+- **Sound is off at first.** Press the **♫** button at the top to turn it on.
+- **Don't want the tips?** Press the **?** button at the top.
+- **Reset** (top right) deletes your garden and starts over. It asks first.
+
+## For whoever is hosting it
+
+You need [Node.js](https://nodejs.org) installed. Then, in a terminal inside this folder:
 
 ```
 npm install
-npm run build        # writes dist/index.html
+npm run build
 ```
 
-`dist/index.html` is fully self-contained (HTML, CSS, JS and Three.js inlined), so you can:
+That makes the whole game as one file, `dist/index.html`. Send that file to people, or put it online:
 
-- **Open it directly** in a browser, email it, or put it on any static host.
-- **Share over Tailscale:** `npm run share` builds and serves it on `0.0.0.0:5173` and prints the URLs. Friends on your tailnet open `http://<your-tailscale-ip>:5173`. Set `PORT=…` to change the port.
-- **Share with a playit.gg tunnel:** run `npm run share`, then create a TCP/HTTP tunnel in playit.gg pointing at local port 5173 and send over the address it gives you.
-- **GitHub Pages (optional):** in the repo settings set Pages → Source to "GitHub Actions", then run the *Deploy to GitHub Pages* workflow from the Actions tab. It tests, builds and publishes `dist/`.
+- **Tailscale:** run `npm run share` and send people on your tailnet `http://<your-tailscale-ip>:5173`. The command prints the addresses.
+- **playit.gg:** run `npm run share`, point a playit.gg tunnel at port 5173 and send the address it gives you.
+- **GitHub Pages:** in this repo's Settings, go to Pages, set Source to "GitHub Actions", then run "Deploy to GitHub Pages" from the Actions tab.
 
-## Development
+For working on the game: `npm start` runs it at http://127.0.0.1:5173 and `npm test` runs the checks. It's plain JavaScript with [Three.js](https://threejs.org), and it needs no accounts or internet connection to play.
 
-```
-git clone https://github.com/Soul4723/chromatic-cacti.git
-cd chromatic-cacti
-npm install
-npm start            # dev server at http://127.0.0.1:5173 (set HOST to expose it)
-npm test             # simulation, progression, combat and save checks
-```
-
-Three.js is bundled locally; no external assets or network services are used. Credits for third-party material are in `THIRD_PARTY_NOTICES.md`.
-
-## License
-
-MIT, see [LICENSE](LICENSE).
+MIT licence, see [LICENSE](LICENSE). Three.js credits are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
